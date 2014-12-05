@@ -1,0 +1,63 @@
+Mockizart\BlogBundle\Entity\BlogCategory:
+    type: entity
+    table: blog_category
+    indexes:
+        slug:
+            columns:
+                - slug
+        name:
+            columns:
+                - name
+        parent:
+            columns:
+                - parent_id
+    id:
+        id:
+            type: integer
+            nullable: false
+            unsigned: false
+            comment: ''
+            id: true
+            generator:
+                strategy: IDENTITY
+    fields:
+        created:
+            type: datetime
+            nullable: false
+            comment: ''
+        name:
+            type: string
+            nullable: false
+            length: 50
+            fixed: false
+            comment: ''
+        content:
+            type: text
+            nullable: false
+            length: null
+            fixed: false
+            comment: ''
+        parentId:
+            type: integer
+            nullable: true
+            unsigned: false
+            comment: ''
+            default: '0'
+            column: parent_id
+        slug:
+            type: string
+            nullable: false
+            length: 150
+            fixed: false
+            comment: ''
+        totalPost:
+            type: integer
+            nullable: true
+            unsigned: false
+            comment: ''
+            column: total_post
+        type:
+            type: boolean
+            nullable: false
+            comment: '0 = category tree, 1 = summary category post, 2 = FULL category post'
+    lifecycleCallbacks: {  }
