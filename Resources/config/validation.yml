@@ -1,0 +1,19 @@
+Mockizart\BlogBundle\Entity\BlogCategory:
+  constraints:
+      - Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity:
+          fields: [slug]
+#          groups: [New]
+  properties:
+    name:
+      - NotBlank: ~
+      - Length:
+          min: 2
+          max: 50
+    slug:
+      - Length:
+          min: 2
+          max: 80
+    type:
+      - NotBlank: ~
+      - Length:
+          min: 1
