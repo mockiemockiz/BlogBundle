@@ -1,0 +1,17 @@
+parameters:
+  category:
+    route_names:
+      list: category
+      show: category_show
+      create: category_create
+      edit: category_edit
+      update: category_update
+      delete: category_delete
+    type:
+      0: "category tree"
+      1: "summary category post"
+      2: "FULL category post"
+    service_entity_name: category_factory
+    service_form_name: form.type.category
+    form_alias: blogcategory
+    entity_alias: BlogBundle:BlogCategory

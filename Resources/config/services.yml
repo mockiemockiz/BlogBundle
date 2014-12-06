@@ -1,4 +1,27 @@
 services:
-#    blog.example:
-#        class: Mockizart\BlogBundle\Example
-#        arguments: [@service_id, "plain_value", %parameter%]
+
+# ======== factory ================
+
+    model_factory:
+      class: Mockizart\BlogBundle\Service\Model\ModelFactory
+
+    category_factory:
+      class: Mockizart\BlogBundle\Service\Model\ModelCategory
+      factory: ["@model_factory", createModelCategory]
+      arguments:
+        - entity_manager: @doctrine.orm.entity_manager
+        - params: "%category%"
+
+# ========= form ==================
+    form.type.category:
+      class: Mockizart\BlogBundle\Form\BlogCategoryType
+      strict: false
+      arguments:
+        params:
+          form_factory: @form.factory
+          entity_factory: @category_factory
+          router: @router
+          params: "%category%"
+      tags:
+        - { name: form.type, alias: blogcategory }
+

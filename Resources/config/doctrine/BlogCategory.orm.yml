@@ -60,4 +60,14 @@ Mockizart\BlogBundle\Entity\BlogCategory:
             type: boolean
             nullable: false
             comment: '0 = category tree, 1 = summary category post, 2 = FULL category post'
+    oneToMany:
+        children:
+            targetEntity: BlogCategory
+            mappedBy: parent
+    manyToOne:
+        parent:
+            name: parent_id
+            targetEntity: BlogCategory
+            cascade: {  }
+            inversedBy: children
     lifecycleCallbacks: {  }

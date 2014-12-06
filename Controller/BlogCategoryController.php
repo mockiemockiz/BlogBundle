@@ -3,17 +3,19 @@
 namespace Mockizart\BlogBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-
-use Mockizart\BlogBundle\Entity\BlogCategory;
-use Mockizart\BlogBundle\Form\BlogCategoryType;
 
 /**
  * BlogCategory controller.
  *
  */
-class BlogCategoryController extends Controller
+class BlogCategoryController extends BaseController
 {
+
+    public function getParam($name)
+    {
+        $this->setParams('category');
+        return parent::getParam($name);
+    }
 
     /**
      * Lists all BlogCategory entities.
@@ -23,53 +25,35 @@ class BlogCategoryController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
 
-        $entities = $em->getRepository('BlogBundle:BlogCategory')->findAll();
+        $entities = $em->getRepository($this->getParam('entity_alias'))->findAll();
 
-        return $this->render('BlogBundle:BlogCategory:index.html.twig', array(
+        return $this->render($this->getParam('entity_alias') . ':index.html.twig', array(
             'entities' => $entities,
         ));
     }
+
     /**
      * Creates a new BlogCategory entity.
      *
      */
     public function createAction(Request $request)
     {
-        $entity = new BlogCategory();
-        $form = $this->createCreateForm($entity);
-        $form->handleRequest($request);
+        $entity = $this->getEntityService()
+            ->setRequest($request)
+            ->setEntity()
+            ->getEntity();
 
-        if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($entity);
-            $em->flush();
+        $form = $this->get($this->getParam('service_form_name'))->createForm($entity);
+        $id = $this->getEntityService()->create($form);
 
-            return $this->redirect($this->generateUrl('category_show', array('id' => $entity->getId())));
+        if ($id) {
+            return $this->redirect($this->generateUrl($this->routesNames['show'], array('id' => $id)));
         }
 
-        return $this->render('BlogBundle:BlogCategory:new.html.twig', array(
-            'entity' => $entity,
+        return $this->render($this->getParam('entity_alias') . ':new.html.twig', array(
+            'entity' => $this->getEntityService()->setEntity()->getEntity(),
             'form'   => $form->createView(),
         ));
-    }
-
-    /**
-     * Creates a form to create a BlogCategory entity.
-     *
-     * @param BlogCategory $entity The entity
-     *
-     * @return \Symfony\Component\Form\Form The form
-     */
-    private function createCreateForm(BlogCategory $entity)
-    {
-        $form = $this->createForm(new BlogCategoryType(), $entity, array(
-            'action' => $this->generateUrl('category_create'),
-            'method' => 'POST',
-        ));
-
-        $form->add('submit', 'submit', array('label' => 'Create'));
-
-        return $form;
     }
 
     /**
@@ -78,147 +62,88 @@ class BlogCategoryController extends Controller
      */
     public function newAction()
     {
-        $entity = new BlogCategory();
-        $form   = $this->createCreateForm($entity);
+        $entity = $this->getEntityService()
+            ->setEntity()
+            ->getEntity();
+        $form = $this->get($this->getParam('service_form_name'));
 
-        return $this->render('BlogBundle:BlogCategory:new.html.twig', array(
+        return $this->render($this->getParam('entity_alias') . ':new.html.twig', array(
             'entity' => $entity,
-            'form'   => $form->createView(),
+            'form'   => $form->createForm($entity)->createView(),
         ));
     }
 
     /**
-     * Finds and displays a BlogCategory entity.
+     * Finds and displays a MockblogCategory entity.
      *
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $entity = $this->getEntityService()->find($id);
+        $deleteForm = $this->get($this->getParam('service_form_name'))->deleteForm($id);
 
-        $entity = $em->getRepository('BlogBundle:BlogCategory')->find($id);
-
-        if (!$entity) {
-            throw $this->createNotFoundException('Unable to find BlogCategory entity.');
-        }
-
-        $deleteForm = $this->createDeleteForm($id);
-
-        return $this->render('BlogBundle:BlogCategory:show.html.twig', array(
+        return $this->render($this->getParam('entity_alias') . ':show.html.twig', array(
             'entity'      => $entity,
             'delete_form' => $deleteForm->createView(),
         ));
     }
 
     /**
-     * Displays a form to edit an existing BlogCategory entity.
+     * Displays a form to edit an existing MockblogCategory entity.
      *
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $entity = $this->getEntityService()->setEntity()->find($id);
+        $form = $this->get($this->getParam('service_form_name'));
+        $editForm = $form->editForm($entity);
+        $deleteForm = $form->deleteForm($id);
 
-        $entity = $em->getRepository('BlogBundle:BlogCategory')->find($id);
-
-        if (!$entity) {
-            throw $this->createNotFoundException('Unable to find BlogCategory entity.');
-        }
-
-        $editForm = $this->createEditForm($entity);
-        $deleteForm = $this->createDeleteForm($id);
-
-        return $this->render('BlogBundle:BlogCategory:edit.html.twig', array(
+        return $this->render($this->getParam('entity_alias') . ':edit.html.twig', array(
             'entity'      => $entity,
             'edit_form'   => $editForm->createView(),
             'delete_form' => $deleteForm->createView(),
         ));
+
     }
 
     /**
-    * Creates a form to edit a BlogCategory entity.
-    *
-    * @param BlogCategory $entity The entity
-    *
-    * @return \Symfony\Component\Form\Form The form
-    */
-    private function createEditForm(BlogCategory $entity)
-    {
-        $form = $this->createForm(new BlogCategoryType(), $entity, array(
-            'action' => $this->generateUrl('category_update', array('id' => $entity->getId())),
-            'method' => 'PUT',
-        ));
-
-        $form->add('submit', 'submit', array('label' => 'Update'));
-
-        return $form;
-    }
-    /**
-     * Edits an existing BlogCategory entity.
+     * Edits an existing MockblogCategory entity.
      *
      */
     public function updateAction(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $entity = $this->getEntityService()
+            ->setRequest($request)
+            ->setEntity()
+            ->find($id);
+        $form = $this->get($this->getParam('service_form_name'));
 
-        $entity = $em->getRepository('BlogBundle:BlogCategory')->find($id);
+        $deleteForm = $form->deleteForm($id);
+        $editForm = $form->editForm($entity);
 
-        if (!$entity) {
-            throw $this->createNotFoundException('Unable to find BlogCategory entity.');
+        if ($this->getEntityService()->save($editForm)) {
+            return $this->redirect($this->generateUrl($this->routesNames['edit'], array('id' => $id)));
         }
 
-        $deleteForm = $this->createDeleteForm($id);
-        $editForm = $this->createEditForm($entity);
-        $editForm->handleRequest($request);
-
-        if ($editForm->isValid()) {
-            $em->flush();
-
-            return $this->redirect($this->generateUrl('category_edit', array('id' => $id)));
-        }
-
-        return $this->render('BlogBundle:BlogCategory:edit.html.twig', array(
+        return $this->render($this->getParam('entity_alias') . ':edit.html.twig', array(
             'entity'      => $entity,
             'edit_form'   => $editForm->createView(),
             'delete_form' => $deleteForm->createView(),
         ));
     }
+
     /**
-     * Deletes a BlogCategory entity.
+     * Deletes a MockblogCategory entity.
      *
      */
     public function deleteAction(Request $request, $id)
     {
-        $form = $this->createDeleteForm($id);
-        $form->handleRequest($request);
-
-        if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $entity = $em->getRepository('BlogBundle:BlogCategory')->find($id);
-
-            if (!$entity) {
-                throw $this->createNotFoundException('Unable to find BlogCategory entity.');
-            }
-
-            $em->remove($entity);
-            $em->flush();
-        }
-
-        return $this->redirect($this->generateUrl('category'));
-    }
-
-    /**
-     * Creates a form to delete a BlogCategory entity by id.
-     *
-     * @param mixed $id The entity id
-     *
-     * @return \Symfony\Component\Form\Form The form
-     */
-    private function createDeleteForm($id)
-    {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('category_delete', array('id' => $id)))
-            ->setMethod('DELETE')
-            ->add('submit', 'submit', array('label' => 'Delete'))
-            ->getForm()
-        ;
+        $form = $this->get($this->getParam('service_form_name'))->deleteForm($id);
+        $this->getEntityService()
+            ->setRequest($request)
+            ->setEntity($id)
+            ->delete($form);
+        return $this->redirect($this->generateUrl($this->routesNames['list']));
     }
 }

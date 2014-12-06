@@ -2,6 +2,7 @@
 
 namespace Mockizart\BlogBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -49,6 +50,14 @@ class BlogCategory
      */
     private $type;
 
+
+    private $children;
+
+    private $parent;
+
+    public function __construct() {
+        $this->children = new ArrayCollection();
+    }
 
     /**
      * Get id
@@ -129,6 +138,17 @@ class BlogCategory
         return $this->content;
     }
 
+    public function setParent(BlogCategory $parent)
+    {
+        $this->parent = $parent;
+        return $this;
+    }
+
+    public function getParent()
+    {
+        return $this->parent;
+    }
+
     /**
      * Set parentId
      *
@@ -150,6 +170,36 @@ class BlogCategory
     public function getParentId()
     {
         return $this->parentId;
+    }
+
+    /**
+     * Add children
+     *
+     * @param BlogCategory $children
+     * @return BlogCategory
+     */
+    public function addChild(BlogCategory $children)
+    {
+        $this->children[] = $children;
+        return $this;
+    }
+    /**
+     * Remove children
+     *
+     * @param BlogCategory $children
+     */
+    public function removeChild(BlogCategory $children)
+    {
+        $this->children->removeElement($children);
+    }
+    /**
+     * Get children
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getChildren()
+    {
+        return $this->children;
     }
 
     /**
