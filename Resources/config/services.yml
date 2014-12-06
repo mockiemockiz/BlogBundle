@@ -1,5 +1,9 @@
 services:
 
+    url_friendly:
+        class:        Mockizart\BlogBundle\Filter\UrlFriendly
+        arguments:    [str]
+
 # ======== factory ================
 
     model_factory:
