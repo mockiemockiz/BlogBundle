@@ -5,6 +5,8 @@ namespace Mockizart\BlogBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
+use DMS\Filter\Rules as Filter;
+
 /**
  * BlogCategory
  */
@@ -22,6 +24,10 @@ class BlogCategory
 
     /**
      * @var string
+     *
+     * @Filter\StripTags()
+     * @Filter\Trim()
+     * @Filter\StripNewlines()
      */
     private $name;
 
@@ -37,6 +43,10 @@ class BlogCategory
 
     /**
      * @var string
+     *
+     * @Filter\StripTags()
+     * @Filter\Trim()
+     * @Filter\StripNewlines()
      */
     private $slug;
 
