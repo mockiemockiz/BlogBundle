@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 use DMS\Filter\Rules as Filter;
+use DMS\Bundle\FilterBundle\Rule as SfFilter;
 
 /**
  * BlogCategory
@@ -47,6 +48,7 @@ class BlogCategory
      * @Filter\StripTags()
      * @Filter\Trim()
      * @Filter\StripNewlines()
+     * @SfFilter\Service(service="url_friendly", method="filter")
      */
     private $slug;
 
